@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Trades{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Trade History</h5>
+        <div>
+            <button class="btn btn-sm btn-outline-primary" onclick="loadTrades()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <ul class="nav nav-tabs mb-3" id="tradeTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button">
+                    All Trades
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="open-tab" data-bs-toggle="tab" data-bs-target="#open" type="button">
+                    Open
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="closed-tab" data-bs-toggle="tab" data-bs-target="#closed" type="button">
+                    Closed
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="tradeTabsContent">
+            <div class="tab-pane fade show active" id="all" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Symbol</th>
+                                <th>Side</th>
+                                <th>Entry Price</th>
+                                <th>Exit Price</th>
+                                <th>Quantity</th>
+                                <th>P&L</th>
+                                <th>Status</th>
+                                <th>Entry Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="all-trades-table">
+                            <tr>
+                                <td colspan="9" class="text-center text-secondary">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="open" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Symbol</th>
+                                <th>Side</th>
+                                <th>Entry Price</th>
+                                <th>Quantity</th>
+                                <th>SL</th>
+                                <th>TP</th>
+                                <th>Entry Time</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="open-trades-table">
+                            <tr>
+                                <td colspan="9" class="text-center text-secondary">No open trades</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="closed" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Symbol</th>
+                                <th>Side</th>
+                                <th>Entry</th>
+                                <th>Exit</th>
+                                <th>P&L</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody id="closed-trades-table">
+                            <tr>
+                                <td colspan="7" class="text-center text-secondary">No closed trades</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', loadTrades);
+    
+    function loadTrades() {
+        fetch('/api/dashboard')
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    updateTradesTable(data.data);
+                }
+            });
+    }
+    
+    function updateTradesTable(data) {
+        const allTrades = [...data.open_positions, ...data.closed_positions];
+        
+        // All trades
+        let allHtml = '';
+        allTrades.forEach(t => {
+            const pnlClass = t.pnl >= 0 ? 'profit' : 'loss';
+            allHtml += `
+                <tr>
+                    <td><small>${t.id}</small></td>
+                    <td>${t.symbol}</td>
+                    <td><span class="badge badge-${t.side.toLowerCase()}">${t.side}</span></td>
+                    <td>${parseFloat(t.entry_price).toFixed(4)}</td>
+                    <td>${t.exit_price ? parseFloat(t.exit_price).toFixed(4) : '-'}</td>
+                    <td>${t.quantity}</td>
+                    <td class="${pnlClass}">$${t.pnl.toFixed(4)}</td>
+                    <td><span class="badge bg-secondary">${t.status}</span></td>
+                    <td><small>${new Date(t.entry_time).toLocaleString()}</small></td>
+                </tr>
+            `;
+        });
+        document.getElementById('all-trades-table').innerHTML = allHtml || 
+            '<tr><td colspan="9" class="text-center text-secondary">No trades</td></tr>';
+        
+        // Open trades
+        let openHtml = '';
+        data.open_positions.forEach(t => {
+            openHtml += `
+                <tr>
+                    <td><small>${t.id}</small></td>
+                    <td>${t.symbol}</td>
+                    <td><span class="badge badge-${t.side.toLowerCase()}">${t.side}</span></td>
+                    <td>${parseFloat(t.entry_price).toFixed(4)}</td>
+                    <td>${t.quantity}</td>
+                    <td>${parseFloat(t.stop_loss_price).toFixed(4)}</td>
+                    <td>${parseFloat(t.take_profit_price).toFixed(4)}</td>
+                    <td><small>${new Date(t.entry_time).toLocaleString()}</small></td>
+                    <td><button class="btn btn-sm btn-danger" onclick="closePosition('${t.symbol}')">Close</button></td>
+                </tr>
+            `;
+        });
+        document.getElementById('open-trades-table').innerHTML = openHtml || 
+            '<tr><td colspan="9" class="text-center text-secondary">No open trades</td></tr>';
+        
+        // Closed trades
+        let closedHtml = '';
+        data.closed_positions.forEach(t => {
+            const pnlClass = t.pnl >= 0 ? 'profit' : 'loss';
+            closedHtml += `
+                <tr>
+                    <td><small>${t.id}</small></td>
+                    <td>${t.symbol}</td>
+                    <td><span class="badge badge-${t.side.toLowerCase()}">${t.side}</span></td>
+                    <td>${parseFloat(t.entry_price).toFixed(4)}</td>
+                    <td>${t.exit_price ? parseFloat(t.exit_price).toFixed(4) : '-'}</td>
+                    <td class="${pnlClass}">$${t.pnl.toFixed(4)}</td>
+                    <td><small>${t.exit_time || '-'}</small></td>
+                </tr>
+            `;
+        });
+        document.getElementById('closed-trades-table').innerHTML = closedHtml || 
+            '<tr><td colspan="7" class="text-center text-secondary">No closed trades</td></tr>';
+    }
+</script>
+{% endblock %}

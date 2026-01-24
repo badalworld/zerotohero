@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <!-- Stats Cards -->
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-value text-success" id="total-pnl">$0.00</div>
+            <div class="stat-label">Total P&L</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-value" id="open-positions">0</div>
+            <div class="stat-label">Open Positions</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-value" id="total-trades">0</div>
+            <div class="stat-label">Total Trades</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-value" id="win-rate">0%</div>
+            <div class="stat-label">Win Rate</div>
+        </div>
+    </div>
+</div>
+
+<!-- Control Panel -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-toggles me-2"></i>Control Panel</h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-warning btn-sm" onclick="switchMode()">
+                        <i class="bi bi-arrow-repeat me-1"></i>
+                        Switch to <span id="switch-mode-text">Mainnet</span>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="trading-toggle" 
+                                   onchange="toggleTrading()" style="width: 50px; height: 25px;">
+                            <label class="form-check-label ms-2" for="trading-toggle">
+                                <span id="trading-status">Trading Disabled</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-primary" onclick="startBot()" id="start-btn">
+                            <i class="bi bi-play-fill me-1"></i> Start Bot
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-danger" onclick="stopBot()" id="stop-btn" disabled>
+                            <i class="bi bi-stop-fill me-1"></i> Stop Bot
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-secondary" onclick="scanNow()">
+                            <i class="bi bi-search me-1"></i> Scan Now
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-warning" onclick="closeAllPositions()">
+                            <i class="bi bi-x-circle me-1"></i> Close All
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Open Positions -->
+    <div class="col-12 col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-wallet2 me-2"></i>Open Positions
+                    <span class="badge bg-primary" id="positions-count">0</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Side</th>
+                                <th>Entry</th>
+                                <th>Size</th>
+                                <th>P&L</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="positions-table">
+                            <tr>
+                                <td colspan="6" class="text-center text-secondary">No open positions</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Signals -->
+    <div class="col-12 col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-broadcast me-2"></i>Recent Signals
+                    <span class="badge bg-info" id="signals-count">0</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Signal</th>
+                                <th>Price</th>
+                                <th>EMA 9</th>
+                                <th>EMA 21</th>
+                            </tr>
+                        </thead>
+                        <tbody id="signals-table">
+                            <tr>
+                                <td colspan="5" class="text-center text-secondary">No signals yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Account Balance -->
+<div class="row g-4 mt-2">
+    <div class="col-12 col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-cash-stack me-2"></i>Account Balance</h5>
+            </div>
+            <div class="card-body" id="balance-info">
+                <div class="text-secondary">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Strategy Info -->
+    <div class="col-12 col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Strategy Settings</h5>
+            </div>
+            <div class="card-body" id="strategy-info">
+                <div class="row">
+                    <div class="col-6">
+                        <p class="mb-1 text-secondary">EMA Fast</p>
+                        <p class="fw-bold" id="cfg-ema-fast">9</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1 text-secondary">EMA Slow</p>
+                        <p class="fw-bold" id="cfg-ema-slow">21</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1 text-secondary">Position Size</p>
+                        <p class="fw-bold" id="cfg-position-size">$4.00</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1 text-secondary">Leverage</p>
+                        <p class="fw-bold" id="cfg-leverage">5x</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1 text-secondary">Stop Loss</p>
+                        <p class="fw-bold" id="cfg-stop-loss">$1.00</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1 text-secondary">Take Profit</p>
+                        <p class="fw-bold" id="cfg-take-profit">$0.20</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logs -->
+    <div class="col-12 col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <h5 class="mb-0"><i class="bi bi-terminal me-2"></i>Logs</h5>
+                <button class="btn btn-sm btn-outline-secondary" onclick="clearLogs()">Clear</button>
+            </div>
+            <div class="card-body" style="max-height: 300px; overflow-y: auto;" id="logs-container">
+                <div class="text-secondary">No logs yet</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Refresh data every 5 seconds
+    setInterval(refreshDashboard, 5000);
+    
+    // Initial load
+    document.addEventListener('DOMContentLoaded', function() {
+        refreshDashboard();
+    });
+</script>
+{% endblock %}

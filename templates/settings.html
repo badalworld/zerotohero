@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- API Settings -->
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-key me-2"></i>API Settings</h5>
+            </div>
+            <div class="card-body">
+                <form id="api-form">
+                    <h6 class="text-warning mb-3">Testnet API Keys</h6>
+                    <div class="mb-3">
+                        <label class="form-label">API Key</label>
+                        <input type="password" class="form-control bg-dark text-light" id="testnet-api-key"
+                               placeholder="Enter testnet API key">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">API Secret</label>
+                        <input type="password" class="form-control bg-dark text-light" id="testnet-api-secret"
+                               placeholder="Enter testnet API secret">
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h6 class="text-danger mb-3">Mainnet API Keys</h6>
+                    <div class="mb-3">
+                        <label class="form-label">API Key</label>
+                        <input type="password" class="form-control bg-dark text-light" id="mainnet-api-key"
+                               placeholder="Enter mainnet API key">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">API Secret</label>
+                        <input type="password" class="form-control bg-dark text-light" id="mainnet-api-secret"
+                               placeholder="Enter mainnet API secret">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-save me-1"></i>Save API Keys
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trading Settings -->
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-sliders me-2"></i>Trading Settings</h5>
+            </div>
+            <div class="card-body">
+                <form id="trading-form">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">EMA Fast Period</label>
+                                <input type="number" class="form-control bg-dark text-light" 
+                                       id="ema-fast" value="9" min="1" max="100">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">EMA Slow Period</label>
+                                <input type="number" class="form-control bg-dark text-light" 
+                                       id="ema-slow" value="21" min="1" max="200">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Position Size ($)</label>
+                                <input type="number" class="form-control bg-dark text-light" 
+                                       id="position-size" value="4" min="1" step="0.1">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Leverage</label>
+                                <input type="number" class="form-control bg-dark text-light" 
+                                       id="leverage" value="5" min="1" max="125">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Stop Loss ($)</label>
+                                <input type="number" class="form-control bg-dark text-light" 
+                                       id="stop-loss" value="1" min="0.1" step="0.1">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Take Profit ($)</label>
+                                <input type="number" class="form-control bg-dark text-light" 
+                                       id="take-profit" value="0.20" min="0.01" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Max Open Trades</label>
+                        <input type="number" class="form-control bg-dark text-light" 
+                               id="max-trades" value="3" min="1" max="10">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Timeframe</label>
+                        <select class="form-select bg-dark text-light" id="timeframe">
+                            <option value="1m">1 Minute</option>
+                            <option value="3m">3 Minutes</option>
+                            <option value="5m" selected>5 Minutes</option>
+                            <option value="15m">15 Minutes</option>
+                            <option value="30m">30 Minutes</option>
+                            <option value="1h">1 Hour</option>
+                            <option value="4h">4 Hours</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-save me-1"></i>Save Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Supabase Settings -->
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-cloud me-2"></i>Supabase (Optional)</h5>
+            </div>
+            <div class="card-body">
+                <form id="supabase-form">
+                    <div class="mb-3">
+                        <label class="form-label">Supabase URL</label>
+                        <input type="text" class="form-control bg-dark text-light" 
+                               id="supabase-url" placeholder="https://xxx.supabase.co">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Supabase Key</label>
+                        <input type="password" class="form-control bg-dark text-light" 
+                               id="supabase-key" placeholder="Enter Supabase anon key">
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="use-supabase">
+                        <label class="form-check-label" for="use-supabase">
+                            Enable Supabase Cloud Storage
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-save me-1"></i>Save Supabase Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Info -->
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>System Info</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <td class="text-secondary">App Name</td>
+                        <td>Zero to Hero</td>
+                    </tr>
+                    <tr>
+                        <td class="text-secondary">Version</td>
+                        <td>1.0.0</td>
+                    </tr>
+                    <tr>
+                        <td class="text-secondary">Author</td>
+                        <td>Md Moniruzzaman</td>
+                    </tr>
+                    <tr>
+                        <td class="text-secondary">Strategy</td>
+                        <td>EMA 9/21 Crossover</td>
+                    </tr>
+                    <tr>
+                        <td class="text-secondary">Platform</td>
+                        <td>Binance Futures (USD-M)</td>
+                    </tr>
+                </table>
+                
+                <div class="mt-4">
+                    <h6>Quick Links</h6>
+                    <a href="https://testnet.binancefuture.com" target="_blank" class="btn btn-outline-warning btn-sm me-2">
+                        Testnet
+                    </a>
+                    <a href="https://www.binance.com/en/futures" target="_blank" class="btn btn-outline-primary btn-sm">
+                        Binance Futures
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // API Form
+    document.getElementById('api-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const data = {
+            testnet_api_key: document.getElementById('testnet-api-key').value,
+            testnet_api_secret: document.getElementById('testnet-api-secret').value,
+            mainnet_api_key: document.getElementById('mainnet-api-key').value,
+            mainnet_api_secret: document.getElementById('mainnet-api-secret').value
+        };
+        
+        fetch('/api/settings/api', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(data => {
+            alert(data.message);
+        });
+    });
+    
+    // Trading Form
+    document.getElementById('trading-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const data = {
+            ema_fast: parseInt(document.getElementById('ema-fast').value),
+            ema_slow: parseInt(document.getElementById('ema-slow').value),
+            position_size: parseFloat(document.getElementById('position-size').value),
+            leverage: parseInt(document.getElementById('leverage').value),
+            stop_loss: parseFloat(document.getElementById('stop-loss').value),
+            take_profit: parseFloat(document.getElementById('take-profit').value),
+            max_trades: parseInt(document.getElementById('max-trades').value),
+            timeframe: document.getElementById('timeframe').value
+        };
+        
+        fetch('/api/settings/trading', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(data => {
+            alert(data.message);
+        });
+    });
+    
+    // Supabase Form
+    document.getElementById('supabase-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const data = {
+            supabase_url: document.getElementById('supabase-url').value,
+            supabase_key: document.getElementById('supabase-key').value,
+            use_supabase: document.getElementById('use-supabase').checked
+        };
+        
+        fetch('/api/settings/supabase', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(data => {
+            alert(data.message);
+        });
+    });
+</script>
+{% endblock %}
