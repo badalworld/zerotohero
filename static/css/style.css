@@ -1,0 +1,110 @@
+/* Zero to Hero - Custom Styles
+   Author: Md Moniruzzaman */
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* Table styles */
+.table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Badge styles */
+.badge-long {
+    background-color: #22c55e !important;
+}
+
+.badge-short {
+    background-color: #ef4444 !important;
+}
+
+/* Status colors */
+.profit {
+    color: #22c55e !important;
+}
+
+.loss {
+    color: #ef4444 !important;
+}
+
+/* Form controls dark theme */
+.form-control:focus,
+.form-select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+}
+
+/* Button hover effects */
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Nav tabs dark theme */
+.nav-tabs .nav-link {
+    color: #94a3b8;
+    border: none;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: transparent;
+    color: #f8fafc;
+    border-bottom: 2px solid #6366f1;
+}
+
+/* Loading animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #6366f1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1rem;
+    }
+}
